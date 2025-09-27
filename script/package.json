@@ -1,0 +1,33 @@
+{
+  "name": "coverage-manager-scripts",
+  "version": "1.0.0",
+  "description": "TypeScript scripts for CoverageManager contract operations",
+  "main": "index.js",
+  "scripts": {
+    "approve": "ts-node approvePremium.ts",
+    "buy": "ts-node buyPolicy.ts",
+    "inspect": "ts-node inspect.ts",
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn --transpile-only"
+  },
+  "dependencies": {
+    "viem": "^2.0.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0",
+    "ts-node-dev": "^2.0.0"
+  },
+  "keywords": [
+    "ethereum",
+    "smart-contracts",
+    "pyth",
+    "insurance",
+    "coverage",
+    "viem"
+  ],
+  "author": "CoverageManager Team",
+  "license": "MIT"
+}

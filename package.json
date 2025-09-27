@@ -1,0 +1,55 @@
+{
+  "name": "rug-pull-insurance",
+  "version": "1.0.0",
+  "description": "Foundry + Node.js hybrid repository for rug pull insurance project",
+  "main": "index.js",
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test",
+    "test:coverage": "forge coverage",
+    "deploy": "forge script",
+    "verify": "forge verify-contract",
+    "deploy:mock": "forge script script/DeployMockERC20.s.sol --rpc-url $RPC_URL --broadcast --verify",
+    "deploy:mock:local": "forge script script/DeployMockERC20.s.sol --rpc-url http://localhost:8545 --broadcast",
+    "mint": "forge script script/Mint.s.sol --rpc-url $RPC_URL --broadcast",
+    "mint:local": "forge script script/Mint.s.sol --rpc-url http://localhost:8545 --broadcast",
+    "mint:to": "forge script script/Mint.s.sol:MintScript --sig 'mintTo(address,uint256)' --rpc-url $RPC_URL --broadcast",
+    "pyth:fetch": "tsx script/fetchPyth.ts",
+    "bot:dev": "cd bot && npm run dev",
+    "bot:build": "cd bot && npm run build",
+    "bot:start": "cd bot && npm start",
+    "bot:ws": "cd bot && npm run bot:ws",
+    "shared:build": "cd packages/shared && npm run build",
+    "shared:dev": "cd packages/shared && npm run dev",
+    "ui:dev": "cd ui && npm run dev",
+    "ui:build": "cd ui && npm run build",
+    "ui:start": "cd ui && npm start",
+    "install:all": "npm install && cd bot && npm install && cd ../packages/shared && npm install && cd ../ui && npm install",
+    "clean": "forge clean && rm -rf node_modules bot/node_modules packages/shared/node_modules ui/node_modules"
+  },
+  "keywords": [
+    "ethereum",
+    "solidity",
+    "foundry",
+    "defi",
+    "insurance",
+    "rug-pull"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "ts-node": "^10.9.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "ethers": "^6.8.0",
+    "viem": "^1.19.0"
+  },
+  "workspaces": [
+    "bot",
+    "packages/shared"
+  ]
+}
