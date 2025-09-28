@@ -16,6 +16,31 @@ A comprehensive Foundry + Node.js hybrid repository for building a rug pull insu
 └── .env.example       # Environment variables template
 ```
 
+## One-Command Demo
+
+Run the complete demo with a single command:
+
+```bash
+npm run demo:fast   # full loop without Hermes (0% trigger)
+npm run demo:pyth   # full loop with real Pyth pull
+```
+
+The demo will:
+- Start the UI and bot
+- Deploy CoverageManager (or reuse existing)
+- Update environment files
+- Seed reserves
+- Approve and buy a policy
+- Make it claimable (fast = 0% trigger, pyth = real Pyth pull)
+- Settle the claim
+- Print explorer links and summary
+
+### Troubleshooting
+
+- If UI doesn't show events, verify `NEXT_PUBLIC_*` in `/ui/.env` and restart `npm run dev`
+- If pyth step fails, check `PYTH_CONTRACT` and `PRICE_ID` against Pyth docs, or use `demo:fast`
+- If deployment fails, ensure you have sufficient ETH for gas fees
+
 ## Features
 
 ### Smart Contracts

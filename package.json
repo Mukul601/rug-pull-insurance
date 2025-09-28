@@ -15,6 +15,10 @@
     "mint:local": "forge script script/Mint.s.sol --rpc-url http://localhost:8545 --broadcast",
     "mint:to": "forge script script/Mint.s.sol:MintScript --sig 'mintTo(address,uint256)' --rpc-url $RPC_URL --broadcast",
     "pyth:fetch": "tsx script/fetchPyth.ts",
+    "demo:fast": "cross-env DEMO_MODE=fast tsx script/orchestrator.ts --verbose",
+    "demo:pyth": "cross-env DEMO_MODE=pyth tsx script/orchestrator.ts --verbose",
+    "dev:ui": "cd ui && npm run dev",
+    "dev:all": "concurrently -k -n UI,BOT -c cyan,magenta \"npm:dev:ui\" \"npm:bot\"",
     "bot:dev": "cd bot && npm run dev",
     "bot:build": "cd bot && npm run build",
     "bot:start": "cd bot && npm start",
@@ -39,9 +43,14 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.10.0",
+    "chalk": "^4.1.2",
+    "concurrently": "^7.6.0",
+    "cross-env": "^7.0.3",
+    "execa": "^7.2.0",
     "ts-node": "^10.9.0",
     "tsx": "^4.20.6",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "wait-on": "^7.0.1"
   },
   "dependencies": {
     "dotenv": "^16.3.1",
