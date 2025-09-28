@@ -31,6 +31,7 @@ sepolia = "https://eth-sepolia.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
 polygon = "https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
 arbitrum = "https://arb-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
 optimism = "https://opt-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}"
+rootstock = "https://public-node.rsk.co"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_API_KEY}" }
@@ -38,4 +39,5 @@ sepolia = { key = "${ETHERSCAN_API_KEY}" }
 polygon = { key = "${POLYGONSCAN_API_KEY}" }
 arbitrum = { key = "${ARBISCAN_API_KEY}" }
 optimism = { key = "${OPTIMISTIC_ETHERSCAN_API_KEY}" }
+rootstock = { key = "${ROOTSTOCKSCAN_API_KEY}" }
 

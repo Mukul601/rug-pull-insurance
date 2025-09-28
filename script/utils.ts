@@ -15,6 +15,7 @@ export const CHAINS = {
   137: polygon,
   42161: arbitrum,
   10: optimism,
+  30: { id: 30, name: 'Rootstock Mainnet' }, // Rootstock
 } as const;
 
 export type SupportedChainId = keyof typeof CHAINS;
