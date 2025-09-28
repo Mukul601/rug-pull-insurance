@@ -232,7 +232,7 @@ async function buyPolicy(options: BuyPolicyOptions) {
       symbol: paymentTokenSymbol
     });
     
-    if (paymentTokenBalance < premiumAmountWei) {
+    if (!dryRun && paymentTokenBalance < premiumAmountWei) {
       throw new Error(`Insufficient payment token balance. Required: ${formatTokenAmount(premiumAmountWei, paymentTokenDecimals)} ${paymentTokenSymbol}, Available: ${formatTokenAmount(paymentTokenBalance, paymentTokenDecimals)} ${paymentTokenSymbol}`);
     }
     
@@ -249,7 +249,7 @@ async function buyPolicy(options: BuyPolicyOptions) {
       symbol: insuredTokenSymbol
     });
     
-    if (insuredTokenBalance < coverageAmountWei) {
+    if (!dryRun && insuredTokenBalance < coverageAmountWei) {
       throw new Error(`Insufficient insured token balance. Required: ${formatTokenAmount(coverageAmountWei, insuredTokenDecimals)} ${insuredTokenSymbol}, Available: ${formatTokenAmount(insuredTokenBalance, insuredTokenDecimals)} ${insuredTokenSymbol}`);
     }
     

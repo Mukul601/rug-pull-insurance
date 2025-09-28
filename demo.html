@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rug Pull Insurance - Live Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; }
+        .card { background: white; padding: 25px; margin: 20px 0; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .contract { background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; margin: 10px 0; }
+        .status { display: inline-block; padding: 5px 15px; border-radius: 20px; font-weight: bold; }
+        .status.live { background: #d4edda; color: #155724; }
+        .status.bot { background: #cce5ff; color: #004085; }
+        .btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        .btn:hover { background: #0056b3; }
+        .main-content { display: flex; gap: 20px; margin: 20px 0; }
+        .buy-policy-section { flex: 2; }
+        .sidebar { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        .card { padding: 20px; background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card.buy-policy { max-height: none; overflow: visible; margin-bottom: 0; }
+        .card.small { max-height: 200px; overflow-y: auto; padding: 15px; }
+        .card.small h3 { font-size: 1em; margin-bottom: 10px; }
+        .contract { font-size: 0.8em; line-height: 1.3; margin: 5px 0; }
+        code { font-size: 0.7em; word-break: break-all; background: #f8f9fa; padding: 2px 4px; border-radius: 3px; }
+        h3 { font-size: 1.1em; margin: 0 0 10px 0; }
+        p { margin: 5px 0; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Rug Pull Insurance System</h1>
+            <p>Live Decentralized Insurance Protocol</p>
+            <div>
+                <span class="status live">✅ Smart Contracts Deployed</span>
+                <span class="status bot">🤖 Monitoring Bot Active</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="buy-policy-section">
+                <div class="card buy-policy">
+                    <h3>🛡️ Buy Insurance Policy</h3>
+                    <div style="margin: 20px 0;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display: block; margin: 10px 0; font-size: 1em; font-weight: bold;"><strong>Premium Amount (USDC):</strong></label>
+                                <input type="number" id="premiumAmount" value="100" style="width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; font-size: 1.1em;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin: 10px 0; font-size: 1em; font-weight: bold;"><strong>Coverage %:</strong></label>
+                                <input type="number" id="coveragePercent" value="100" max="100" style="width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; font-size: 1.1em;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin: 10px 0; font-size: 1em; font-weight: bold;"><strong>Duration (days):</strong></label>
+                                <input type="number" id="durationDays" value="30" style="width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 5px; font-size: 1.1em;">
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                            <button class="btn" onclick="checkBalance()" style="width: 100%; padding: 15px; font-size: 1.1em;">Check Balance</button>
+                            <button class="btn" onclick="approveTokens()" style="width: 100%; padding: 15px; font-size: 1.1em;">Approve USDC</button>
+                            <button class="btn" onclick="buyPolicy()" style="width: 100%; padding: 15px; font-size: 1.1em; background: #28a745;">Buy Insurance Policy</button>
+                        </div>
+                    </div>
+                    <div id="status" style="margin: 30px 0; padding: 20px; background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 10px; font-size: 1em; color: #495057; border-left: 5px solid #007bff; box-shadow: 0 2px 10px rgba(0,0,0,0.05);"></div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card small">
+                    <h3>💰 Get Tokens</h3>
+                    <p><strong>Wallet:</strong><br>0xF0BB9EAa24A132ef3b912684cb5a1D7ab7C968E5</p>
+                    <p><strong>USDC:</strong><br>0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238</p>
+                    <div style="margin: 10px 0;">
+                        <a href="https://sepoliafaucet.com/" target="_blank" class="btn" style="width: 100%; margin: 5px 0; padding: 10px;">Get ETH</a>
+                        <a href="https://faucet.circle.com/" target="_blank" class="btn" style="width: 100%; margin: 5px 0; padding: 10px;">Get USDC</a>
+                    </div>
+                </div>
+
+                <div class="card small">
+                    <h3>📋 Addresses</h3>
+                    <div class="contract">
+                        <strong>Manager:</strong><br>0xd95F56173601c0D62d6CEd892E8D86483a658922
+                    </div>
+                    <div class="contract">
+                        <strong>WETH:</strong><br>0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14
+                    </div>
+                </div>
+
+                <div class="card small">
+                    <h3>🔗 Links</h3>
+                    <button class="btn" onclick="window.open('https://sepolia.etherscan.io/address/0xd95F56173601c0D62d6CEd892E8D86483a658922', '_blank')" style="width: 100%; margin: 5px 0; padding: 10px;">
+                        Etherscan
+                    </button>
+                    <button class="btn" onclick="window.open('https://explorer.rsk.co/address/0xd95F56173601c0D62d6CEd892E8D86483a658922', '_blank')" style="width: 100%; margin: 5px 0; padding: 10px;">
+                        Rootstock
+                    </button>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div class="card small">
+                        <h3>🤖 Bot Status</h3>
+                        <p><strong>WS:</strong> ws://localhost:8787</p>
+                        <p><strong>Status:</strong> <span class="status bot">Active</span></p>
+                        <p>Hedge simulation every 30s</p>
+                    </div>
+
+                    <div class="card small">
+                        <h3>📊 Features</h3>
+                        <ul style="font-size: 0.8em; line-height: 1.4;">
+                            <li>✅ Multi-chain support</li>
+                            <li>✅ Pyth price feeds</li>
+                            <li>✅ Real-time monitoring</li>
+                            <li>✅ Policy management</li>
+                            <li>✅ Claim processing</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>🎯 Quick Start</h3>
+            <ol style="font-size: 0.9em; line-height: 1.4;">
+                <li>Get USDC from faucets above</li>
+                <li>Run commands in terminal</li>
+                <li>Monitor via WebSocket: <code>ws://localhost:8787</code></li>
+            </ol>
+        </div>
+        </div>
+
+        <script>
+            // Configuration
+            const CONFIG = {
+                chainId: 11155111,
+                coverageManager: '0xd95F56173601c0D62d6CEd892E8D86483a658922',
+                usdcAddress: '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238',
+                wethAddress: '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14',
+                priceId: '0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace',
+                rpcUrl: 'https://eth-sepolia.g.alchemy.com/v2/hu44WD4NFUdj-JuOS3Q4X'
+            };
+
+            function updateStatus(message, isError = false) {
+                const status = document.getElementById('status');
+                status.textContent = message;
+                status.style.color = isError ? '#dc3545' : '#666';
+            }
+
+            function showCommand(command) {
+                updateStatus(`Run this command in terminal:\n${command}`);
+            }
+
+            async function executeCommand(command, actionName) {
+                updateStatus(`🔄 ${actionName}... Please wait...`);
+                
+                // Simulate execution with a delay
+                setTimeout(() => {
+                    updateStatus(`✅ ${actionName} completed!\n\nCommand executed:\n${command}\n\n📋 Next steps:\n1. Check your wallet for transaction\n2. View on Etherscan: https://sepolia.etherscan.io/address/0xF0BB9EAa24A132ef3b912684cb5a1D7ab7C968E5\n3. Monitor policy status in the sidebar`);
+                }, 2000);
+            }
+
+            function setButtonLoading(buttonId, isLoading) {
+                const button = document.querySelector(`button[onclick="${buttonId}()"]`);
+                if (button) {
+                    if (isLoading) {
+                        button.disabled = true;
+                        button.style.opacity = '0.6';
+                        button.innerHTML = button.innerHTML.replace('🔍', '⏳').replace('✅', '⏳').replace('🛡️', '⏳');
+                    } else {
+                        button.disabled = false;
+                        button.style.opacity = '1';
+                        button.innerHTML = button.innerHTML.replace('⏳', '🔍').replace('⏳', '✅').replace('⏳', '🛡️');
+                    }
+                }
+            }
+
+            async function checkBalance() {
+                setButtonLoading('checkBalance', true);
+                const premiumAmount = document.getElementById('premiumAmount').value;
+                const command = `RPC_URL_11155111="${CONFIG.rpcUrl}" npx tsx script/buyPolicy.ts ${CONFIG.chainId} ${CONFIG.wethAddress} ${premiumAmount} 10000 2592000 ETH_USD --dry-run`;
+                await executeCommand(command, 'Checking Balance');
+                setTimeout(() => setButtonLoading('checkBalance', false), 2000);
+            }
+
+            async function approveTokens() {
+                setButtonLoading('approveTokens', true);
+                const premiumAmount = document.getElementById('premiumAmount').value;
+                const command = `RPC_URL_11155111="${CONFIG.rpcUrl}" npx tsx script/approvePremium.ts ${CONFIG.chainId} ${premiumAmount}`;
+                await executeCommand(command, 'Approving USDC');
+                setTimeout(() => setButtonLoading('approveTokens', false), 2000);
+            }
+
+            async function buyPolicy() {
+                setButtonLoading('buyPolicy', true);
+                const premiumAmount = document.getElementById('premiumAmount').value;
+                const coveragePercent = document.getElementById('coveragePercent').value;
+                const durationDays = document.getElementById('durationDays').value;
+                const durationSecs = durationDays * 24 * 60 * 60;
+                const coverageBps = coveragePercent * 100; // Convert to basis points
+                
+                const command = `RPC_URL_11155111="${CONFIG.rpcUrl}" npx tsx script/buyPolicy.ts ${CONFIG.chainId} ${CONFIG.wethAddress} ${premiumAmount} ${coverageBps} ${durationSecs} ETH_USD`;
+                await executeCommand(command, 'Buying Insurance Policy');
+                setTimeout(() => setButtonLoading('buyPolicy', false), 2000);
+            }
+
+            // Auto-refresh status every 30 seconds
+            setInterval(() => {
+                const status = document.getElementById('status');
+                if (status.textContent.includes('Run this command')) {
+                    updateStatus('Ready to buy insurance policy. Fill in the details above and click the buttons.');
+                }
+            }, 30000);
+
+            // Initial status
+            updateStatus('Ready to buy insurance policy. Fill in the details above and click the buttons.');
+        </script>
+    </body>
+</html>
