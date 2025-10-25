@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { createPublicClient, createWalletClient, http, parseUnits, formatUnits } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { mainnet, sepolia, polygon, arbitrum, optimism } from 'viem/chains';
+import { mainnet, sepolia, base, baseSepolia } from 'viem/chains';
 import * as dotenv from 'dotenv';
 
 // Load environment variables
@@ -12,10 +12,8 @@ dotenv.config();
 export const CHAINS = {
   1: mainnet,
   11155111: sepolia,
-  137: polygon,
-  42161: arbitrum,
-  10: optimism,
-  30: { id: 30, name: 'Rootstock Mainnet' }, // Rootstock
+  8453: base,
+  84532: baseSepolia,
 } as const;
 
 export type SupportedChainId = keyof typeof CHAINS;
@@ -182,9 +180,8 @@ export function getExplorerUrl(chainId: number, txHash: string): string {
   const explorerUrls = {
     1: `https://etherscan.io/tx/${txHash}`,
     11155111: `https://sepolia.etherscan.io/tx/${txHash}`,
-    137: `https://polygonscan.com/tx/${txHash}`,
-    42161: `https://arbiscan.io/tx/${txHash}`,
-    10: `https://optimistic.etherscan.io/tx/${txHash}`,
+    8453: `https://basescan.org/tx/${txHash}`,
+    84532: `https://sepolia.basescan.org/tx/${txHash}`,
   };
   
   return explorerUrls[chainId as keyof typeof explorerUrls] || `https://etherscan.io/tx/${txHash}`;

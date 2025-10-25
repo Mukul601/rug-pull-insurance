@@ -44,8 +44,9 @@ The demo will:
 ## Features
 
 ### Smart Contracts
-- **RugPullInsurance**: Main insurance contract with policy management
-- **MockERC20**: Test token for development and testing
+- **CoverageManager**: Main insurance contract with policy management
+- **MockERC20**: Optional test token for development and testing
+- **MockPyth**: Optional mock price oracle for testing (uses real Pyth on mainnet)
 - Comprehensive test suite with Foundry
 
 ### Monitoring Bot
@@ -143,21 +144,26 @@ Configure the monitoring bot through environment variables:
 Supported networks:
 - Ethereum Mainnet
 - Sepolia Testnet
-- Polygon
-- Arbitrum
-- Optimism
+- Base Mainnet
+- Base Sepolia Testnet
 
 ## Deployment
 
 ### Testnet Deployment
 ```bash
-# Deploy to Sepolia testnet
+# Deploy to Base Sepolia testnet
+forge script script/DeployTestnet.s.sol --rpc-url $RPC_URL_BASE_SEPOLIA --broadcast --verify
+
+# Deploy to Ethereum Sepolia testnet
 forge script script/DeployTestnet.s.sol --rpc-url $RPC_URL_SEPOLIA --broadcast --verify
 ```
 
 ### Mainnet Deployment
 ```bash
-# Deploy to mainnet
+# Deploy to Base mainnet
+forge script script/Deploy.s.sol --rpc-url $RPC_URL_BASE --broadcast --verify
+
+# Deploy to Ethereum mainnet
 forge script script/Deploy.s.sol --rpc-url $RPC_URL_MAINNET --broadcast --verify
 ```
 
@@ -174,7 +180,8 @@ The monitoring bot continuously watches for:
 import { MonitoringService } from '@rug-pull-insurance/shared';
 
 const monitoringService = new MonitoringService();
-await monitoringService.addMonitoredToken(1, '0x...'); // Chain ID 1 = Ethereum
+await monitoringService.addMonitoredToken(8453, '0x...'); // Chain ID 8453 = Base
+await monitoringService.addMonitoredToken(1, '0x...');    // Chain ID 1 = Ethereum
 ```
 
 ### Alert Configuration
