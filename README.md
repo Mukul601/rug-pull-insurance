@@ -165,7 +165,7 @@ Supported networks:
 ### Testnet Deployment
 ```bash
 # Deploy to Base Sepolia testnet
-forge script script/DeployTestnet.s.sol --rpc-url $RPC_URL_BASE_SEPOLIA --broadcast --verify
+npm run deploy:base-sepolia
 
 # Deploy to Ethereum Sepolia testnet
 forge script script/DeployTestnet.s.sol --rpc-url $RPC_URL_SEPOLIA --broadcast --verify
@@ -174,11 +174,19 @@ forge script script/DeployTestnet.s.sol --rpc-url $RPC_URL_SEPOLIA --broadcast -
 ### Mainnet Deployment
 ```bash
 # Deploy to Base mainnet
-forge script script/Deploy.s.sol --rpc-url $RPC_URL_BASE --broadcast --verify
+npm run deploy:base
 
 # Deploy to Ethereum mainnet
 forge script script/Deploy.s.sol --rpc-url $RPC_URL_MAINNET --broadcast --verify
 ```
+
+### Base Deployment Scripts
+The project includes dedicated Base deployment scripts:
+- `script/DeployBase.s.sol`: Main deployment script for Base networks
+- `npm run deploy:base-sepolia`: Deploy to Base Sepolia testnet
+- `npm run deploy:base`: Deploy to Base mainnet
+
+**Note**: Make sure your Alchemy app has Base networks enabled. If you get a 403 error, visit your Alchemy dashboard to enable Base and Base Sepolia networks.
 
 ## Monitoring
 
