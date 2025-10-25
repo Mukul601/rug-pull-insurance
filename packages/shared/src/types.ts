@@ -11,11 +11,8 @@ export interface NetworkConfig {
 }
 
 export interface ContractAddresses {
-  mainnet?: string;
-  sepolia?: string;
-  polygon?: string;
-  arbitrum?: string;
-  optimism?: string;
+  base?: string;
+  base_sepolia?: string;
 }
 
 export interface InsurancePolicy {

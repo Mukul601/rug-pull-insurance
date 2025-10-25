@@ -1,57 +1,24 @@
 import { NetworkConfig } from './types';
 
 export const SUPPORTED_NETWORKS: Record<string, NetworkConfig> = {
-  mainnet: {
-    name: 'Ethereum Mainnet',
-    chainId: 1,
-    rpcUrl: process.env.RPC_URL_MAINNET || '',
-    blockExplorer: 'https://etherscan.io',
+  base: {
+    name: 'Base Mainnet',
+    chainId: 8453,
+    rpcUrl: process.env.BASE_RPC_URL || 'https://mainnet.base.org',
+    blockExplorer: 'https://basescan.org',
     nativeCurrency: {
       name: 'Ether',
       symbol: 'ETH',
       decimals: 18,
     },
   },
-  sepolia: {
-    name: 'Sepolia Testnet',
-    chainId: 11155111,
-    rpcUrl: process.env.RPC_URL_SEPOLIA || '',
-    blockExplorer: 'https://sepolia.etherscan.io',
+  base_sepolia: {
+    name: 'Base Sepolia',
+    chainId: 84532,
+    rpcUrl: process.env.BASE_SEPOLIA_RPC_URL || 'https://sepolia.base.org',
+    blockExplorer: 'https://sepolia.basescan.org',
     nativeCurrency: {
       name: 'Sepolia Ether',
-      symbol: 'ETH',
-      decimals: 18,
-    },
-  },
-  polygon: {
-    name: 'Polygon Mainnet',
-    chainId: 137,
-    rpcUrl: process.env.RPC_URL_POLYGON || '',
-    blockExplorer: 'https://polygonscan.com',
-    nativeCurrency: {
-      name: 'Polygon',
-      symbol: 'MATIC',
-      decimals: 18,
-    },
-  },
-  arbitrum: {
-    name: 'Arbitrum One',
-    chainId: 42161,
-    rpcUrl: process.env.RPC_URL_ARBITRUM || '',
-    blockExplorer: 'https://arbiscan.io',
-    nativeCurrency: {
-      name: 'Ether',
-      symbol: 'ETH',
-      decimals: 18,
-    },
-  },
-  optimism: {
-    name: 'Optimism',
-    chainId: 10,
-    rpcUrl: process.env.RPC_URL_OPTIMISM || '',
-    blockExplorer: 'https://optimistic.etherscan.io',
-    nativeCurrency: {
-      name: 'Ether',
       symbol: 'ETH',
       decimals: 18,
     },
@@ -79,6 +46,6 @@ export const DEFAULT_BOT_CONFIG = {
   intervalMs: 60000, // 1 minute
   maxRetries: 3,
   timeoutMs: 30000, // 30 seconds
-  enabledChains: [1, 11155111, 137, 42161, 10], // mainnet, sepolia, polygon, arbitrum, optimism
+  enabledChains: [8453, 84532], // base, base_sepolia
 } as const;
 

@@ -11,17 +11,14 @@ interface Command {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const chainId = searchParams.get('chainId') || '11155111';
+    const chainId = searchParams.get('chainId') || '84532';
     const coverageManager = searchParams.get('coverageManager') || '0x...';
     const policyId = searchParams.get('policyId') || '0x...';
     
     // Get chain name for display
     const chainNames: Record<string, string> = {
-      '1': 'mainnet',
-      '11155111': 'sepolia',
-      '137': 'polygon',
-      '42161': 'arbitrum',
-      '10': 'optimism',
+      '8453': 'base',
+      '84532': 'base_sepolia',
     };
     
     const chainName = chainNames[chainId] || 'unknown';
@@ -142,8 +139,8 @@ export async function GET(request: NextRequest) {
         data: {
           commands: [],
           metadata: {
-            chainId: '11155111',
-            chainName: 'sepolia',
+            chainId: '84532',
+            chainName: 'base_sepolia',
             coverageManager: '0x...',
             policyId: '0x...',
             totalCommands: 0,

@@ -10,17 +10,14 @@ export const addresses = {
 } as const;
 
 export const config = {
-  chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '11155111'),
-  rpcUrl: process.env.NEXT_PUBLIC_RPC_URL || 'https://sepolia.infura.io/v3/YOUR_KEY',
+  chainId: parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '84532'),
+  rpcUrl: process.env.NEXT_PUBLIC_RPC_URL || 'https://sepolia.base.org',
 } as const;
 
 // ============ CHAIN CONFIGURATION ============
 const chains = {
-  1: mainnet,
-  11155111: sepolia,
-  137: polygon,
-  42161: arbitrum,
-  10: optimism,
+  8453: base,
+  84532: baseSepolia,
 } as const;
 
 export type SupportedChainId = keyof typeof chains;
@@ -172,11 +169,8 @@ export function isValidAddress(address: string): address is Address {
 
 export function getExplorerUrl(chainId: number, hash: string, type: 'tx' | 'address' = 'tx'): string {
   const explorers = {
-    1: 'https://etherscan.io',
-    11155111: 'https://sepolia.etherscan.io',
-    137: 'https://polygonscan.com',
-    42161: 'https://arbiscan.io',
-    10: 'https://optimistic.etherscan.io',
+    8453: 'https://basescan.org',
+    84532: 'https://sepolia.basescan.org',
   };
   
   const baseUrl = explorers[chainId as SupportedChainId];

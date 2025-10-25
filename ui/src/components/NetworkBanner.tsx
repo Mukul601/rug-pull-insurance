@@ -10,7 +10,7 @@ export function NetworkBanner() {
   const { switchChain } = useSwitchChain();
   const [isDismissed, setIsDismissed] = useState(false);
   
-  const targetChainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '11155111');
+  const targetChainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '84532');
   const isWrongNetwork = chain?.id !== targetChainId;
 
   if (isDismissed || !isWrongNetwork) {
@@ -27,11 +27,8 @@ export function NetworkBanner() {
 
   const getChainName = (chainId: number) => {
     const chainNames: Record<number, string> = {
-      1: 'Ethereum Mainnet',
-      11155111: 'Sepolia Testnet',
-      137: 'Polygon',
-      42161: 'Arbitrum One',
-      10: 'Optimism',
+      8453: 'Base Mainnet',
+      84532: 'Base Sepolia',
     };
     return chainNames[chainId] || `Chain ${chainId}`;
   };
