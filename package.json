@@ -23,6 +23,7 @@
     "demo:pyth": "cross-env DEMO_MODE=pyth tsx script/orchestrator.ts --verbose",
     "demo:fast:base": "cross-env DEMO_MODE=fast tsx script/orchestrator.ts --chain=base_sepolia --verbose",
     "demo:pyth:base": "cross-env DEMO_MODE=pyth tsx script/orchestrator.ts --chain=base_sepolia --verbose",
+    "smoke:base": "tsx script/smokeBase.ts",
     "dev:ui": "cd ui && npm run dev",
     "dev:all": "concurrently -k -n UI,BOT -c cyan,magenta \"npm:dev:ui\" \"npm:bot\"",
     "bot:dev": "cd bot && npm run dev",

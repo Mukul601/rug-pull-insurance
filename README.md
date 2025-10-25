@@ -52,7 +52,13 @@ npm run deploy:base-sepolia
 npm run demo:fast:base
 ```
 
-### 5. Open UI
+### 5. Smoke Test (Optional)
+```bash
+# Quick health check of deployed contracts
+npm run smoke:base
+```
+
+### 6. Open UI
 Open [http://localhost:3000](http://localhost:3000) to see your insurance system running on Base Sepolia!
 
 ## One-Command Demo
@@ -248,6 +254,40 @@ The system supports optional Pyth Network integration for real-time price feeds:
    ```
 
 **Default behavior:** Without Pyth configuration, the system uses fast mode (0% trigger) for immediate claimability.
+
+### Smoke Test
+Quick health check for deployed contracts on Base Sepolia:
+
+```bash
+npm run smoke:base
+```
+
+**What it checks:**
+- ✅ CoverageManager contract exists on chain
+- ✅ Reads pool reserves and protocol fees
+- ✅ Validates PremiumToken address
+- ✅ Provides BaseScan explorer links
+- ✅ Confirms contract code is deployed
+
+**Output example:**
+```
+🔍 Base Sepolia Smoke Test
+==================================================
+📊 Smoke Test Results
+==================================================
+Chain ID: 84532 (Base Sepolia)
+CoverageManager: 0x...
+PremiumToken: 0x...
+Pool Reserves: 1000000
+Protocol Fees: 5000
+✅ Manager code exists on chain
+
+🔗 BaseScan Links:
+   CoverageManager: https://sepolia.basescan.org/address/0x...
+   PremiumToken: https://sepolia.basescan.org/address/0x...
+
+✅ Smoke test passed! Base Sepolia contracts are healthy.
+```
 
 ## Deployment
 
