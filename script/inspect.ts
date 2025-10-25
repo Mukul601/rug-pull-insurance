@@ -128,6 +128,7 @@ interface InspectOptions {
   policyId?: string | undefined;
   showAllTokens?: boolean;
   showAllPolicies?: boolean;
+  chain?: 'base' | 'base_sepolia';
 }
 
 // Policy status enum
@@ -218,13 +219,38 @@ function createStatsTable(stats: any) {
 }
 
 async function inspect(options: InspectOptions) {
-  const { chainId, tokenAddress, policyId, showAllTokens = false, showAllPolicies = false } = options;
+  const { chainId, tokenAddress, policyId, showAllTokens = false, showAllPolicies = false, chain } = options;
   
   try {
-    // Validate environment variables
-    validateEnvVars(['PRIVATE_KEY', `RPC_URL_${chainId}`]);
+    // Determine chain and RPC URL
+    let targetChain: 'base' | 'base_sepolia';
+    let rpcUrl: string;
     
-    // Load network configuration
+    if (chain) {
+      targetChain = chain;
+      rpcUrl = chain === 'base_sepolia' 
+        ? (process.env['BASE_SEPOLIA_RPC_URL'] || '')
+        : (process.env['BASE_RPC_URL'] || '');
+    } else {
+      // Auto-detect based on chain ID
+      if (chainId === 84532) {
+        targetChain = 'base_sepolia';
+        rpcUrl = process.env['BASE_SEPOLIA_RPC_URL'] || '';
+      } else if (chainId === 8453) {
+        targetChain = 'base';
+        rpcUrl = process.env['BASE_RPC_URL'] || '';
+      } else {
+        throw new Error(`Unsupported chain ID: ${chainId}. Only Base networks (8453, 84532) are supported.`);
+      }
+    }
+    
+    // Validate environment variables
+    validateEnvVars(['PRIVATE_KEY']);
+    if (!rpcUrl) {
+      throw new Error(`RPC URL not found for ${targetChain}. Please set ${targetChain === 'base_sepolia' ? 'BASE_SEPOLIA_RPC_URL' : 'BASE_RPC_URL'}`);
+    }
+    
+    // Load network configuration with fallback to addresses.json
     const networkConfig = getNetworkConfig(chainId as any);
     
     if (!networkConfig.coverageManager) {
@@ -243,8 +269,8 @@ async function inspect(options: InspectOptions) {
       policyId
     });
     
-    // Create clients
-    const { publicClient, account } = createClients(chainId as any);
+    // Create clients with custom RPC URL
+    const { publicClient, account } = createClients(chainId as any, rpcUrl);
     
     // Get contract stats
     logInfo(`Fetching contract statistics...`);
@@ -504,21 +530,22 @@ async function main() {
 Usage: ts-node inspect.ts <chainId> [options]
 
 Arguments:
-  chainId      - Chain ID (1=mainnet, 11155111=sepolia, 137=polygon, 42161=arbitrum, 10=optimism)
+  chainId      - Chain ID (8453=base, 84532=base_sepolia)
 
 Options:
+  --chain <chain>          - Override chain selection (base or base_sepolia)
   --token <address>        - Inspect specific token
   --policy <policyId>      - Inspect specific policy
   --show-all-tokens        - Show all supported tokens
   --show-all-policies      - Show all supported price IDs
 
 Examples:
-  ts-node inspect.ts 1                                    # Basic inspection
-  ts-node inspect.ts 1 --token 0x...                     # Inspect specific token
-  ts-node inspect.ts 1 --policy 0x...                    # Inspect specific policy
-  ts-node inspect.ts 1 --show-all-tokens                 # Show all supported tokens
-  ts-node inspect.ts 1 --show-all-policies               # Show all supported price IDs
-  ts-node inspect.ts 1 --token 0x... --policy 0x...      # Inspect both token and policy
+  ts-node inspect.ts 84532                                # Basic inspection on base_sepolia
+  ts-node inspect.ts 84532 --token 0x...                  # Inspect specific token on base_sepolia
+  ts-node inspect.ts 84532 --policy 0x...                 # Inspect specific policy on base_sepolia
+  ts-node inspect.ts 8453 --chain base --show-all-tokens  # Show all supported tokens on base
+  ts-node inspect.ts 84532 --show-all-policies            # Show all supported price IDs on base_sepolia
+  ts-node inspect.ts 84532 --token 0x... --policy 0x...   # Inspect both token and policy on base_sepolia
     `);
     process.exit(1);
   }
@@ -537,6 +564,9 @@ Examples:
   const policyIndex = args.indexOf('--policy');
   const policyId = policyIndex !== -1 ? args[policyIndex + 1] : undefined;
   
+  const chainIndex = args.indexOf('--chain');
+  const chain = chainIndex !== -1 && args[chainIndex + 1] ? args[chainIndex + 1] as 'base' | 'base_sepolia' : undefined;
+  
   const showAllTokens = args.includes('--show-all-tokens');
   const showAllPolicies = args.includes('--show-all-policies');
   
@@ -545,7 +575,8 @@ Examples:
     tokenAddress,
     policyId,
     showAllTokens,
-    showAllPolicies
+    showAllPolicies,
+    chain
   });
 }
 

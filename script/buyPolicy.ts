@@ -108,6 +108,7 @@ interface BuyPolicyOptions {
   durationSecs: number;
   priceId: string;
   dryRun?: boolean;
+  chain?: 'base' | 'base_sepolia';
 }
 
 // Policy status enum (for reference)
@@ -119,13 +120,38 @@ interface BuyPolicyOptions {
 // } as const;
 
 async function buyPolicy(options: BuyPolicyOptions) {
-  const { chainId, insuredToken, premiumAmount, coveragePctBps, durationSecs, priceId, dryRun = false } = options;
+  const { chainId, insuredToken, premiumAmount, coveragePctBps, durationSecs, priceId, dryRun = false, chain } = options;
   
   try {
-    // Validate environment variables
-    validateEnvVars(['PRIVATE_KEY', `RPC_URL_${chainId}`]);
+    // Determine chain and RPC URL
+    let targetChain: 'base' | 'base_sepolia';
+    let rpcUrl: string;
     
-    // Load network configuration
+    if (chain) {
+      targetChain = chain;
+      rpcUrl = chain === 'base_sepolia' 
+        ? (process.env['BASE_SEPOLIA_RPC_URL'] || '')
+        : (process.env['BASE_RPC_URL'] || '');
+    } else {
+      // Auto-detect based on chain ID
+      if (chainId === 84532) {
+        targetChain = 'base_sepolia';
+        rpcUrl = process.env['BASE_SEPOLIA_RPC_URL'] || '';
+      } else if (chainId === 8453) {
+        targetChain = 'base';
+        rpcUrl = process.env['BASE_RPC_URL'] || '';
+      } else {
+        throw new Error(`Unsupported chain ID: ${chainId}. Only Base networks (8453, 84532) are supported.`);
+      }
+    }
+    
+    // Validate environment variables
+    validateEnvVars(['PRIVATE_KEY']);
+    if (!rpcUrl) {
+      throw new Error(`RPC URL not found for ${targetChain}. Please set ${targetChain === 'base_sepolia' ? 'BASE_SEPOLIA_RPC_URL' : 'BASE_RPC_URL'}`);
+    }
+    
+    // Load network configuration with fallback to addresses.json
     const networkConfig = getNetworkConfig(chainId as any);
     
     if (!networkConfig.coverageManager) {
@@ -148,8 +174,8 @@ async function buyPolicy(options: BuyPolicyOptions) {
       dryRun
     });
     
-    // Create clients
-    const { publicClient, walletClient, account } = createClients(chainId as any);
+    // Create clients with custom RPC URL
+    const { publicClient, walletClient, account } = createClients(chainId as any, rpcUrl);
     
     // Get payment token information
     const [paymentTokenName, paymentTokenSymbol, paymentTokenDecimals] = await Promise.all([
@@ -373,7 +399,7 @@ async function main() {
 Usage: ts-node buyPolicy.ts <chainId> <insuredToken> <premiumAmount> <coveragePctBps> <durationSecs> <priceId> [options]
 
 Arguments:
-  chainId          - Chain ID (1=mainnet, 11155111=sepolia, 137=polygon, 42161=arbitrum, 10=optimism)
+  chainId          - Chain ID (8453=base, 84532=base_sepolia)
   insuredToken     - Address of token to insure
   premiumAmount    - Premium amount in payment token units
   coveragePctBps   - Coverage percentage in basis points (e.g., 10000 = 100%)
@@ -381,17 +407,17 @@ Arguments:
   priceId          - Pyth price ID for the insured token
 
 Options:
+  --chain <chain>  - Override chain selection (base or base_sepolia)
   --dry-run        - Simulate without executing transaction
 
 Examples:
-  ts-node buyPolicy.ts 1 "0xA0b86a33E6441b8c4C8C0e4A0e4A0e4A0e4A0e4A0" "100" 10000 2592000 "ETH_USD"
-  ts-node buyPolicy.ts 11155111 "0x..." "50" 5000 86400 "BTC_USD" --dry-run
-  ts-node buyPolicy.ts 137 "0x..." "200" 15000 604800 "MATIC_USD"
+  ts-node buyPolicy.ts 84532 "0xA0b86a33E6441b8c4C8C0e4A0e4A0e4A0e4A0e4A0" "100" 10000 2592000 "ETH_USD"
+  ts-node buyPolicy.ts 84532 "0x..." "50" 5000 86400 "BTC_USD" --dry-run
+  ts-node buyPolicy.ts 8453 "0x..." "200" 15000 604800 "ETH_USD" --chain base
 
 Price ID Examples:
   ETH_USD: 0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace
   BTC_USD: 0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43
-  MATIC_USD: 0x5de33a9112c2b690b95bdb69a4ecc8c406defeb9defc4b6658fd88eac2bac8a6
     `);
     process.exit(1);
   }
@@ -402,7 +428,11 @@ Price ID Examples:
   const coveragePctBps = parseInt(args[3] || '0');
   const durationSecs = parseInt(args[4] || '0');
   const priceId = args[5] || '';
+  
+  // Parse options
   const dryRun = args.includes('--dry-run');
+  const chainIndex = args.indexOf('--chain');
+  const chain = chainIndex !== -1 && args[chainIndex + 1] ? args[chainIndex + 1] as 'base' | 'base_sepolia' : undefined;
   
   // Validate required arguments
   if (chainId === 0 || !insuredToken || !premiumAmount || coveragePctBps === 0 || durationSecs === 0 || !priceId) {
@@ -429,7 +459,8 @@ Price ID Examples:
     coveragePctBps,
     durationSecs,
     priceId,
-    dryRun
+    dryRun,
+    chain
   });
 }
 

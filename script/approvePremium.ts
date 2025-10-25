@@ -70,16 +70,42 @@ interface ApprovePremiumOptions {
   chainId: number;
   amount: string;
   dryRun?: boolean;
+  chain?: 'base' | 'base_sepolia';
 }
 
 async function approvePremium(options: ApprovePremiumOptions) {
-  const { chainId, amount, dryRun = false } = options;
+  const { chainId, amount, dryRun = false, chain } = options;
   
   try {
-    // Validate environment variables
-    validateEnvVars(['PRIVATE_KEY', `RPC_URL_${chainId}`]);
+    // Determine chain and RPC URL
+    let targetChain: 'base' | 'base_sepolia';
+    let rpcUrl: string;
     
-    // Load network configuration
+    if (chain) {
+      targetChain = chain;
+      rpcUrl = chain === 'base_sepolia' 
+        ? (process.env['BASE_SEPOLIA_RPC_URL'] || '')
+        : (process.env['BASE_RPC_URL'] || '');
+    } else {
+      // Auto-detect based on chain ID
+      if (chainId === 84532) {
+        targetChain = 'base_sepolia';
+        rpcUrl = process.env['BASE_SEPOLIA_RPC_URL'] || '';
+      } else if (chainId === 8453) {
+        targetChain = 'base';
+        rpcUrl = process.env['BASE_RPC_URL'] || '';
+      } else {
+        throw new Error(`Unsupported chain ID: ${chainId}. Only Base networks (8453, 84532) are supported.`);
+      }
+    }
+    
+    // Validate environment variables
+    validateEnvVars(['PRIVATE_KEY']);
+    if (!rpcUrl) {
+      throw new Error(`RPC URL not found for ${targetChain}. Please set ${targetChain === 'base_sepolia' ? 'BASE_SEPOLIA_RPC_URL' : 'BASE_RPC_URL'}`);
+    }
+    
+    // Load network configuration with fallback to addresses.json
     const networkConfig = getNetworkConfig(chainId as any);
     
     if (!networkConfig.coverageManager) {
@@ -98,8 +124,8 @@ async function approvePremium(options: ApprovePremiumOptions) {
       dryRun
     });
     
-    // Create clients
-    const { publicClient, walletClient, account } = createClients(chainId as any);
+    // Create clients with custom RPC URL
+    const { publicClient, walletClient, account } = createClients(chainId as any, rpcUrl);
     
     // Get token information
     const [tokenName, tokenSymbol, tokenDecimals] = await Promise.all([
@@ -239,23 +265,28 @@ async function main() {
 Usage: ts-node approvePremium.ts <chainId> [amount] [options]
 
 Arguments:
-  chainId      - Chain ID (1=mainnet, 11155111=sepolia, 137=polygon, 42161=arbitrum, 10=optimism)
+  chainId      - Chain ID (8453=base, 84532=base_sepolia)
   amount       - Amount to approve in token units (default: 1000)
 
 Options:
-  --dry-run    - Simulate without executing transaction
+  --chain <chain>  - Override chain selection (base or base_sepolia)
+  --dry-run        - Simulate without executing transaction
 
 Examples:
-  ts-node approvePremium.ts 1 "1000"                    # Approve 1000 tokens on mainnet
-  ts-node approvePremium.ts 11155111 "500" --dry-run    # Dry run on sepolia
-  ts-node approvePremium.ts 137 "2000"                  # Approve 2000 tokens on polygon
+  ts-node approvePremium.ts 84532 "1000"                    # Approve 1000 tokens on base_sepolia
+  ts-node approvePremium.ts 84532 "500" --dry-run           # Dry run on base_sepolia
+  ts-node approvePremium.ts 8453 "2000" --chain base        # Approve 2000 tokens on base
     `);
     process.exit(1);
   }
   
   const chainId = parseInt(args[0] || '0');
   const amount = args[1] || '1000'; // Default to 1000
+  
+  // Parse options
   const dryRun = args.includes('--dry-run');
+  const chainIndex = args.indexOf('--chain');
+  const chain = chainIndex !== -1 && args[chainIndex + 1] ? args[chainIndex + 1] as 'base' | 'base_sepolia' : undefined;
   
   if (chainId === 0) {
     console.error('❌ Chain ID is required');
@@ -265,7 +296,8 @@ Examples:
   await approvePremium({
     chainId,
     amount,
-    dryRun
+    dryRun,
+    chain
   });
 }
 

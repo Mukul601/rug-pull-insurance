@@ -74,13 +74,13 @@ export function getNetworkConfig(chainId: SupportedChainId): NetworkConfig {
 }
 
 // Create Viem clients
-export function createClients(chainId: SupportedChainId): {
+export function createClients(chainId: SupportedChainId, customRpcUrl?: string): {
   publicClient: any;
   walletClient: any;
   account: any;
 } {
   const chain = CHAINS[chainId];
-  const rpcUrl = process.env[`RPC_URL_${chainId}`] || process.env['RPC_URL'];
+  const rpcUrl = customRpcUrl || process.env[`RPC_URL_${chainId}`] || process.env['RPC_URL'];
   
   if (!rpcUrl) {
     throw new Error(`RPC_URL for chain ${chainId} not found in environment variables`);

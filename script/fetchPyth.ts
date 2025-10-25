@@ -49,6 +49,7 @@ interface FetchPythOptions {
   chainId: number;
   priceId: string;
   useCoverageManager?: boolean;
+  chain?: 'base' | 'base_sepolia';
 }
 
 async function fetchPriceUpdatesFromHermes(priceId: string): Promise<string[]> {
@@ -90,13 +91,38 @@ async function fetchPriceUpdatesFromHermes(priceId: string): Promise<string[]> {
 }
 
 async function fetchPythUpdates(options: FetchPythOptions) {
-  const { chainId, priceId, useCoverageManager = false } = options;
+  const { chainId, priceId, useCoverageManager = false, chain } = options;
   
   try {
-    // Validate environment variables
-    validateEnvVars(['PRIVATE_KEY', `RPC_URL_${chainId}`]);
+    // Determine chain and RPC URL
+    let targetChain: 'base' | 'base_sepolia';
+    let rpcUrl: string;
     
-    // Load network configuration
+    if (chain) {
+      targetChain = chain;
+      rpcUrl = chain === 'base_sepolia' 
+        ? (process.env['BASE_SEPOLIA_RPC_URL'] || '')
+        : (process.env['BASE_RPC_URL'] || '');
+    } else {
+      // Auto-detect based on chain ID
+      if (chainId === 84532) {
+        targetChain = 'base_sepolia';
+        rpcUrl = process.env['BASE_SEPOLIA_RPC_URL'] || '';
+      } else if (chainId === 8453) {
+        targetChain = 'base';
+        rpcUrl = process.env['BASE_RPC_URL'] || '';
+      } else {
+        throw new Error(`Unsupported chain ID: ${chainId}. Only Base networks (8453, 84532) are supported.`);
+      }
+    }
+    
+    // Validate environment variables
+    validateEnvVars(['PRIVATE_KEY']);
+    if (!rpcUrl) {
+      throw new Error(`RPC URL not found for ${targetChain}. Please set ${targetChain === 'base_sepolia' ? 'BASE_SEPOLIA_RPC_URL' : 'BASE_RPC_URL'}`);
+    }
+    
+    // Load network configuration with fallback to addresses.json
     const networkConfig = getNetworkConfig(chainId as any);
     
     if (!networkConfig.pythContract) {
@@ -111,8 +137,8 @@ async function fetchPythUpdates(options: FetchPythOptions) {
       useCoverageManager
     });
     
-    // Create clients
-    const { publicClient, walletClient, account } = createClients(chainId as any);
+    // Create clients with custom RPC URL
+    const { publicClient, walletClient, account } = createClients(chainId as any, rpcUrl);
     
     // Fetch price updates from Hermes
     const updateData = await retry(async () => {
@@ -206,17 +232,19 @@ async function main() {
 Usage: ts-node fetchPyth.ts <chainId> <priceId> [options]
 
 Arguments:
-  chainId      - Chain ID (1=mainnet, 11155111=sepolia, 137=polygon, 42161=arbitrum, 10=optimism)
+  chainId      - Chain ID (8453=base, 84532=base_sepolia)
   priceId      - Pyth price ID (e.g., ETH_USD, BTC_USD, etc.)
 
 Options:
-  --use-coverage-manager  - Use CoverageManager contract instead of Pyth contract
-  --help                  - Show this help message
+  --chain <chain>            - Override chain selection (base or base_sepolia)
+  --use-coverage-manager     - Use CoverageManager contract instead of Pyth contract
+  --help                     - Show this help message
 
 Examples:
-  ts-node fetchPyth.ts 1 "ETH_USD"                           # Update ETH price on mainnet
-  ts-node fetchPyth.ts 11155111 "BTC_USD"                    # Update BTC price on sepolia
-  ts-node fetchPyth.ts 1 "ETH_USD" --use-coverage-manager    # Update via CoverageManager
+  ts-node fetchPyth.ts 84532 "ETH_USD"                           # Update ETH price on base_sepolia
+  ts-node fetchPyth.ts 84532 "BTC_USD"                           # Update BTC price on base_sepolia
+  ts-node fetchPyth.ts 8453 "ETH_USD" --chain base               # Update ETH price on base
+  ts-node fetchPyth.ts 84532 "ETH_USD" --use-coverage-manager    # Update via CoverageManager
     `);
     process.exit(1);
   }
@@ -224,6 +252,10 @@ Examples:
   const chainId = parseInt(args[0]);
   const priceId = args[1];
   const useCoverageManager = args.includes('--use-coverage-manager');
+  
+  // Parse options
+  const chainIndex = args.indexOf('--chain');
+  const chain = chainIndex !== -1 && args[chainIndex + 1] ? args[chainIndex + 1] as 'base' | 'base_sepolia' : undefined;
   
   if (isNaN(chainId)) {
     logError('Invalid chain ID provided');
@@ -238,7 +270,8 @@ Examples:
   await fetchPythUpdates({
     chainId,
     priceId,
-    useCoverageManager
+    useCoverageManager,
+    chain
   });
 }
 
