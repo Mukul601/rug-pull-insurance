@@ -29,6 +29,7 @@ function updateAddress(network: 'base_sepolia' | 'base', key: 'CoverageManager' 
 interface DemoConfig {
   mode: 'fast' | 'pyth';
   verbose: boolean;
+  chain: 'base' | 'base_sepolia';
   coverageManager?: string;
   premiumToken: string;
   pythContract: string;
@@ -44,7 +45,7 @@ const REQUIRED_UI_VARS = ['NEXT_PUBLIC_CHAIN_ID', 'NEXT_PUBLIC_RPC_URL', 'NEXT_P
 // CLI argument parser
 function parseArgs() {
   const args = process.argv.slice(2);
-  const config: { mode: 'fast' | 'pyth'; verbose: boolean } = {
+  const config: { mode: 'fast' | 'pyth'; verbose: boolean; chain?: 'base' | 'base_sepolia' } = {
     mode: 'fast',
     verbose: false
   };
@@ -54,6 +55,11 @@ function parseArgs() {
       const mode = arg.split('=')[1] as 'fast' | 'pyth';
       if (mode === 'fast' || mode === 'pyth') {
         config.mode = mode;
+      }
+    } else if (arg.startsWith('--chain=')) {
+      const chain = arg.split('=')[1] as 'base' | 'base_sepolia';
+      if (chain === 'base' || chain === 'base_sepolia') {
+        config.chain = chain;
       }
     } else if (arg === '--verbose') {
       config.verbose = true;
@@ -105,6 +111,7 @@ class DemoOrchestrator {
     this.config = {
       mode: (process.env['DEMO_MODE'] as 'fast' | 'pyth') || cliArgs.mode,
       verbose: process.env['VERBOSE'] === 'true' || cliArgs.verbose,
+      chain: cliArgs.chain || 'base_sepolia', // Default to base_sepolia
       premiumToken: process.env['PREMIUM_TOKEN'] || '',
       pythContract: process.env['PYTH_CONTRACT'] || '',
       priceId: process.env['PRICE_ID'] || '',
@@ -119,6 +126,7 @@ class DemoOrchestrator {
     // Print configuration
     console.log(chalk.cyan('\n📋 Configuration:'));
     console.log(chalk.gray(`   Mode: ${this.config.mode}`));
+    console.log(chalk.gray(`   Chain: ${this.config.chain}`));
     console.log(chalk.gray(`   Verbose: ${this.config.verbose}`));
     console.log(chalk.gray(`   Premium Token: ${this.config.premiumToken}`));
     console.log(chalk.gray(`   Pyth Contract: ${this.config.pythContract}`));
@@ -195,14 +203,34 @@ class DemoOrchestrator {
     }
   }
 
-  private async deployCoverageManager(): Promise<void> {
-    logStep('Deploying CoverageManager', 'Deploying smart contract to Base Sepolia...');
+  private async updateUIEnvironment(): Promise<void> {
+    const chainId = this.config.chain === 'base' ? '8453' : '84532';
+    const rpcUrl = this.config.chain === 'base' 
+      ? (process.env['BASE_RPC_URL'] || 'https://mainnet.base.org')
+      : (process.env['BASE_SEPOLIA_RPC_URL'] || 'https://sepolia.base.org');
     
-    const command = 'npm run deploy:base-sepolia';
+    // Update UI .env with Base values
+    if (this.config.coverageManager) {
+      setEnvLine('./ui/.env', 'NEXT_PUBLIC_COVERAGE_MANAGER', this.config.coverageManager);
+    }
+    setEnvLine('./ui/.env', 'NEXT_PUBLIC_CHAIN_ID', chainId);
+    setEnvLine('./ui/.env', 'NEXT_PUBLIC_RPC_URL', rpcUrl);
+    setEnvLine('./ui/.env', 'NEXT_PUBLIC_PREMIUM_TOKEN', this.config.premiumToken);
+    setEnvLine('./ui/.env', 'NEXT_PUBLIC_PYTH', this.config.pythContract);
+    setEnvLine('./ui/.env', 'NEXT_PUBLIC_PRICE_ID', this.config.priceId);
+    
+    logInfo(`Updated ./ui/.env with Base ${this.config.chain} configuration`);
+  }
+
+  private async deployCoverageManager(): Promise<void> {
+    const chainName = this.config.chain === 'base' ? 'Base Mainnet' : 'Base Sepolia';
+    logStep('Deploying CoverageManager', `Deploying smart contract to ${chainName}...`);
+    
+    const command = this.config.chain === 'base' ? 'npm run deploy:base' : 'npm run deploy:base-sepolia';
     this.commands.push(command);
     
     try {
-      const { stdout } = await run('npm', ['run', 'deploy:base-sepolia']);
+      const { stdout } = await run('npm', ['run', this.config.chain === 'base' ? 'deploy:base' : 'deploy:base-sepolia']);
       
       // Extract address from stdout
       const addressMatch = stdout.match(/CoverageManager:\s+(0x[a-fA-F0-9]{40})/);
@@ -213,14 +241,11 @@ class DemoOrchestrator {
       this.config.coverageManager = addressMatch[1] || '';
       
       // Update addresses.json
-      updateAddress('base_sepolia', 'CoverageManager', this.config.coverageManager);
+      updateAddress(this.config.chain, 'CoverageManager', this.config.coverageManager);
       logInfo(`Updated packages/shared/addresses.json`);
       
-      // Update UI .env
-      if (this.config.coverageManager) {
-        setEnvLine('./ui/.env', 'NEXT_PUBLIC_COVERAGE_MANAGER', this.config.coverageManager);
-      }
-      logInfo(`Updated ./ui/.env`);
+      // Update UI .env with Base values
+      await this.updateUIEnvironment();
       
       logSuccess(`CoverageManager deployed: ${this.config.coverageManager}`);
     } catch (error) {
@@ -320,15 +345,32 @@ class DemoOrchestrator {
   }
 
   private async printSummary(): Promise<void> {
+    const chainId = this.config.chain === 'base' ? 8453 : 84532;
+    const chainName = this.config.chain === 'base' ? 'Base Mainnet' : 'Base Sepolia';
+    const explorerBase = this.config.chain === 'base' ? 'https://basescan.org' : 'https://sepolia.basescan.org';
+    
     console.log(chalk.green.bold('\n📊 Demo Summary'));
     console.log(chalk.gray('=' .repeat(50)));
-    console.log(chalk.cyan(`Chain ID: ${BASE_SEPOLIA_CHAIN_ID} (Base Sepolia)`));
+    console.log(chalk.cyan(`Chain ID: ${chainId} (${chainName})`));
     console.log(chalk.cyan(`CoverageManager: ${this.config.coverageManager}`));
     console.log(chalk.cyan(`Premium Token: ${this.config.premiumToken}`));
     console.log(chalk.cyan(`Pyth Contract: ${this.config.pythContract}`));
     console.log(chalk.cyan(`Price ID: ${this.config.priceId}`));
     console.log(chalk.cyan(`Policy ID: ${this.config.policyId}`));
     console.log(chalk.cyan(`Mode: ${this.config.mode}`));
+    
+    // Print BaseScan links
+    if (this.config.coverageManager) {
+      console.log(chalk.blue('\n🔗 BaseScan Links:'));
+      console.log(chalk.blue(`   CoverageManager: ${explorerBase}/address/${this.config.coverageManager}`));
+      if (this.config.premiumToken) {
+        console.log(chalk.blue(`   Premium Token: ${explorerBase}/address/${this.config.premiumToken}`));
+      }
+      if (this.config.pythContract) {
+        console.log(chalk.blue(`   Pyth Contract: ${explorerBase}/address/${this.config.pythContract}`));
+      }
+    }
+    
     console.log(chalk.green('\n🌐 Open UI: http://localhost:3000'));
     console.log(chalk.yellow('If UI was already running, we didn\'t restart it.'));
     console.log(chalk.yellow('\n📝 Commands executed:'));
