@@ -83,8 +83,13 @@ npm run install:all
 
 3. Set up environment variables:
 ```bash
+# Root environment variables
 cp .env.example .env
 # Edit .env with your configuration
+
+# UI environment variables
+cp ui/.env.example ui/.env.local
+# Edit ui/.env.local with your contract addresses
 ```
 
 ### Development
@@ -136,15 +141,31 @@ The `foundry.toml` file contains:
 - **Default RPC**: Set to `base_sepolia` for scripts and tests
 
 #### Environment Variables
-Set up your environment variables in `.env`:
-```bash
-# Base RPC URLs (required for foundry.toml)
-BASE_RPC_URL=https://base-mainnet.g.alchemy.com/v2/YOUR_ALCHEMY_API_KEY
-BASE_SEPOLIA_RPC_URL=https://base-sepolia.g.alchemy.com/v2/YOUR_ALCHEMY_API_KEY
 
-# Other RPC URLs
-RPC_URL_MAINNET=https://eth-mainnet.g.alchemy.com/v2/YOUR_ALCHEMY_API_KEY
-RPC_URL_SEPOLIA=https://eth-sepolia.g.alchemy.com/v2/YOUR_ALCHEMY_API_KEY
+**Root `.env` file:**
+```bash
+# Private Key (required for deployment and transactions)
+PRIVATE_KEY=your_private_key_here
+
+# Base RPC URLs (required for foundry.toml)
+BASE_RPC_URL=https://mainnet.base.org
+BASE_SEPOLIA_RPC_URL=https://sepolia.base.org
+
+# Contract Addresses
+PREMIUM_TOKEN=0x...   # MockERC20 or USDC test token on Base Sepolia
+PYTH_CONTRACT=0x...   # optional: Pyth on Base
+PRICE_ID=0x...        # optional: ETH/USD feed id
+```
+
+**UI `.env.local` file:**
+```bash
+# Base Network Configuration
+NEXT_PUBLIC_CHAIN_ID=84532
+NEXT_PUBLIC_RPC_URL=https://sepolia.base.org
+NEXT_PUBLIC_COVERAGE_MANAGER=0x...
+NEXT_PUBLIC_PREMIUM_TOKEN=0x...
+NEXT_PUBLIC_PYTH=0x...
+NEXT_PUBLIC_PRICE_ID=0x...
 ```
 
 ### Bot Configuration
