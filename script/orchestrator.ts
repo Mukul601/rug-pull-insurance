@@ -2,7 +2,28 @@
 
 import { execa } from 'execa';
 import chalk from 'chalk';
-import { writeJson, readJson, setEnvLine, fileExists, readFile } from './utils/fs';
+import { writeJson, setEnvLine, fileExists, readFile } from './utils/fs';
+
+// Address utilities
+function loadAddresses(): any {
+  try {
+    const addressesPath = './packages/shared/addresses.json';
+    const addressesData = readFile(addressesPath);
+    return JSON.parse(addressesData);
+  } catch (error) {
+    console.warn('Failed to load addresses.json, using environment variables only');
+    return {};
+  }
+}
+
+function updateAddress(network: 'base_sepolia' | 'base', key: 'CoverageManager' | 'PremiumToken' | 'Pyth' | 'PriceId', value: string): void {
+  const addresses = loadAddresses();
+  if (!addresses[network]) {
+    addresses[network] = {};
+  }
+  addresses[network][key] = value;
+  writeJson('./packages/shared/addresses.json', addresses);
+}
 
 // Types
 interface DemoConfig {
@@ -192,11 +213,8 @@ class DemoOrchestrator {
       this.config.coverageManager = addressMatch[1] || '';
       
       // Update addresses.json
-      const addressesPath = './packages/shared/addresses.json';
-      const addresses = readJson(addressesPath);
-      addresses.networks['base-sepolia'].coverageManager = this.config.coverageManager;
-      writeJson(addressesPath, addresses);
-      logInfo(`Updated ${addressesPath}`);
+      updateAddress('base_sepolia', 'CoverageManager', this.config.coverageManager);
+      logInfo(`Updated packages/shared/addresses.json`);
       
       // Update UI .env
       if (this.config.coverageManager) {

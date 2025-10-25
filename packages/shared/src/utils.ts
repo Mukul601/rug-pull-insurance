@@ -2,6 +2,8 @@ import { ethers } from 'ethers';
 import { viem } from 'viem';
 import { NetworkConfig, RugPullEvent } from './types';
 import { SUPPORTED_NETWORKS } from './constants';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 export class NetworkUtils {
   static getNetworkConfig(chainId: number): NetworkConfig | undefined {
@@ -116,6 +118,83 @@ export class Logger {
     if (this.shouldLog('debug')) {
       console.debug(`[DEBUG] ${new Date().toISOString()} - ${message}`, ...args);
     }
+  }
+}
+
+export class AddressUtils {
+  private static addressesCache: any = null;
+
+  static loadAddresses(): any {
+    if (this.addressesCache) {
+      return this.addressesCache;
+    }
+
+    try {
+      const addressesPath = join(__dirname, '../addresses.json');
+      const addressesData = readFileSync(addressesPath, 'utf8');
+      this.addressesCache = JSON.parse(addressesData);
+      return this.addressesCache;
+    } catch (error) {
+      console.warn('Failed to load addresses.json, using environment variables only');
+      return {};
+    }
+  }
+
+  static getCoverageManager(network: 'base_sepolia' | 'base' = 'base_sepolia'): string {
+    const addresses = this.loadAddresses();
+    const address = addresses[network]?.CoverageManager;
+    
+    if (address && address !== '') {
+      return address;
+    }
+    
+    // Fallback to environment variable
+    return process.env['COVERAGE_MANAGER'] || '';
+  }
+
+  static getPremiumToken(network: 'base_sepolia' | 'base' = 'base_sepolia'): string {
+    const addresses = this.loadAddresses();
+    const address = addresses[network]?.PremiumToken;
+    
+    if (address && address !== '') {
+      return address;
+    }
+    
+    // Fallback to environment variable
+    return process.env['PREMIUM_TOKEN'] || '';
+  }
+
+  static getPyth(network: 'base_sepolia' | 'base' = 'base_sepolia'): string {
+    const addresses = this.loadAddresses();
+    const address = addresses[network]?.Pyth;
+    
+    if (address && address !== '') {
+      return address;
+    }
+    
+    // Fallback to environment variable
+    return process.env['PYTH_CONTRACT'] || '';
+  }
+
+  static getPriceId(network: 'base_sepolia' | 'base' = 'base_sepolia'): string {
+    const addresses = this.loadAddresses();
+    const priceId = addresses[network]?.PriceId;
+    
+    if (priceId && priceId !== '') {
+      return priceId;
+    }
+    
+    // Fallback to environment variable
+    return process.env['PRICE_ID'] || '';
+  }
+
+  static updateAddress(network: 'base_sepolia' | 'base', key: 'CoverageManager' | 'PremiumToken' | 'Pyth' | 'PriceId', value: string): void {
+    const addresses = this.loadAddresses();
+    if (!addresses[network]) {
+      addresses[network] = {};
+    }
+    addresses[network][key] = value;
+    this.addressesCache = addresses;
   }
 }
 

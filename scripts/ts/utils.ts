@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { createPublicClient, createWalletClient, http, parseEther, formatEther, parseUnits, formatUnits } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { mainnet, sepolia, polygon, arbitrum, optimism } from 'viem/chains';
+import { base, baseSepolia } from 'viem/chains';
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -10,11 +10,8 @@ dotenv.config();
 
 // Chain configurations
 export const CHAINS = {
-  1: mainnet,
-  11155111: sepolia,
-  137: polygon,
-  42161: arbitrum,
-  10: optimism,
+  8453: base,
+  84532: baseSepolia,
 } as const;
 
 export type SupportedChainId = keyof typeof CHAINS;
@@ -33,30 +30,47 @@ export interface AddressesConfig {
   networks: Record<string, NetworkConfig>;
 }
 
-// Load addresses from JSON file
-export function loadAddresses(): AddressesConfig {
+// Load addresses from JSON file with fallback to environment variables
+export function loadAddresses(): any {
   try {
     const addressesPath = join(__dirname, 'addresses.json');
     const addressesData = readFileSync(addressesPath, 'utf8');
-    return JSON.parse(addressesData) as AddressesConfig;
+    return JSON.parse(addressesData);
   } catch (error) {
-    console.error('Failed to load addresses.json:', error);
-    process.exit(1);
+    console.warn('Failed to load addresses.json, using environment variables only');
+    return {};
   }
 }
 
-// Get network configuration
+// Get network configuration with fallback to environment variables
 export function getNetworkConfig(chainId: SupportedChainId): NetworkConfig {
   const addresses = loadAddresses();
-  const networkName = Object.keys(addresses.networks).find(
-    key => addresses.networks[key].chainId === chainId
-  );
   
-  if (!networkName) {
-    throw new Error(`Network with chainId ${chainId} not found in addresses.json`);
+  // Determine network name based on chain ID
+  let networkName: string;
+  if (chainId === 84532) {
+    networkName = 'base_sepolia';
+  } else if (chainId === 8453) {
+    networkName = 'base';
+  } else {
+    throw new Error(`Unsupported chain ID: ${chainId}. Only Base networks (8453, 84532) are supported.`);
   }
   
-  return addresses.networks[networkName];
+  const networkData = addresses[networkName];
+  
+  // Create network config with fallback to environment variables
+  const networkConfig: NetworkConfig = {
+    chainId,
+    name: chainId === 84532 ? 'Base Sepolia Testnet' : 'Base Mainnet',
+    coverageManager: networkData?.CoverageManager || process.env['COVERAGE_MANAGER'] || '',
+    paymentToken: networkData?.PremiumToken || process.env['PREMIUM_TOKEN'] || '',
+    pythContract: networkData?.Pyth || process.env['PYTH_CONTRACT'] || '',
+    priceIds: {
+      ETH_USD: networkData?.PriceId || process.env['PRICE_ID'] || ''
+    }
+  };
+  
+  return networkConfig;
 }
 
 // Create Viem clients
