@@ -99,8 +99,8 @@
 
                 <div class="card small">
                     <h3>🔗 Links</h3>
-                    <button class="btn" onclick="window.open('https://sepolia.etherscan.io/address/0xd95F56173601c0D62d6CEd892E8D86483a658922', '_blank')" style="width: 100%; margin: 5px 0; padding: 10px;">
-                        Etherscan
+                    <button class="btn" onclick="window.open('https://sepolia.basescan.org/address/0xd95F56173601c0D62d6CEd892E8D86483a658922', '_blank')" style="width: 100%; margin: 5px 0; padding: 10px;">
+                        BaseScan
                     </button>
                     <button class="btn" onclick="window.open('https://basescan.org/address/0xd95F56173601c0D62d6CEd892E8D86483a658922', '_blank')" style="width: 100%; margin: 5px 0; padding: 10px;">
                         Basescan
@@ -170,9 +170,9 @@
                     } else if (actionName === 'Approving USDC') {
                         updateStatus(`✅ USDC approval completed!\n\n🔗 Transaction: 0x1234...5678\n📋 Next: Click "Buy Insurance Policy" to complete your purchase.`);
                     } else if (actionName === 'Buying Insurance Policy') {
-                        updateStatus(`✅ Insurance policy purchased successfully!\n\n🛡️ Policy ID: #12345\n💰 Premium: 100 USDC\n📅 Duration: 30 days\n🔗 View on Etherscan: https://sepolia.etherscan.io/address/0xF0BB9EAa24A132ef3b912684cb5a1D7ab7C968E5\n\n🎉 Your assets are now protected!`);
+                        updateStatus(`✅ Insurance policy purchased successfully!\n\n🛡️ Policy ID: #12345\n💰 Premium: 100 USDC\n📅 Duration: 30 days\n🔗 View on BaseScan: https://sepolia.basescan.org/address/0xF0BB9EAa24A132ef3b912684cb5a1D7ab7C968E5\n\n🎉 Your assets are now protected!`);
                     } else {
-                        updateStatus(`✅ ${actionName} completed!\n\nCommand executed:\n${command}\n\n📋 Next steps:\n1. Check your wallet for transaction\n2. View on Etherscan: https://sepolia.etherscan.io/address/0xF0BB9EAa24A132ef3b912684cb5a1D7ab7C968E5\n3. Monitor policy status in the sidebar`);
+                        updateStatus(`✅ ${actionName} completed!\n\nCommand executed:\n${command}\n\n📋 Next steps:\n1. Check your wallet for transaction\n2. View on BaseScan: https://sepolia.basescan.org/address/0xF0BB9EAa24A132ef3b912684cb5a1D7ab7C968E5\n3. Monitor policy status in the sidebar`);
                     }
                 }, 2000);
             }

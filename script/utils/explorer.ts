@@ -5,6 +5,8 @@ export function getExplorerUrl(chainId: number): string {
   const explorers: Record<number, string> = {
     1: 'https://etherscan.io',
     11155111: 'https://sepolia.etherscan.io',
+    8453: 'https://basescan.org',
+    84532: 'https://sepolia.basescan.org',
     137: 'https://polygonscan.com',
     42161: 'https://arbiscan.io',
     10: 'https://optimistic.etherscan.io',

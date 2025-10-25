@@ -3,7 +3,6 @@
 import { execa } from 'execa';
 import chalk from 'chalk';
 import { writeJson, readJson, setEnvLine, fileExists, readFile } from './utils/fs';
-import { getTransactionUrl } from './utils/explorer';
 
 // Types
 interface DemoConfig {
@@ -17,8 +16,8 @@ interface DemoConfig {
 }
 
 // Constants
-const SEPOLIA_CHAIN_ID = 11155111;
-const REQUIRED_ROOT_VARS = ['PRIVATE_KEY', 'SEPOLIA_RPC_URL', 'PREMIUM_TOKEN', 'PYTH_CONTRACT', 'PRICE_ID'];
+const BASE_SEPOLIA_CHAIN_ID = 84532;
+const REQUIRED_ROOT_VARS = ['PRIVATE_KEY', 'BASE_SEPOLIA_RPC_URL', 'PREMIUM_TOKEN', 'PYTH_CONTRACT', 'PRICE_ID'];
 const REQUIRED_UI_VARS = ['NEXT_PUBLIC_CHAIN_ID', 'NEXT_PUBLIC_RPC_URL', 'NEXT_PUBLIC_PYTH'];
 
 // CLI argument parser
@@ -83,11 +82,11 @@ class DemoOrchestrator {
   constructor() {
     const cliArgs = parseArgs();
     this.config = {
-      mode: process.env.DEMO_MODE as 'fast' | 'pyth' || cliArgs.mode,
-      verbose: process.env.VERBOSE === 'true' || cliArgs.verbose,
-      premiumToken: process.env.PREMIUM_TOKEN || '',
-      pythContract: process.env.PYTH_CONTRACT || '',
-      priceId: process.env.PRICE_ID || '',
+      mode: (process.env['DEMO_MODE'] as 'fast' | 'pyth') || cliArgs.mode,
+      verbose: process.env['VERBOSE'] === 'true' || cliArgs.verbose,
+      premiumToken: process.env['PREMIUM_TOKEN'] || '',
+      pythContract: process.env['PYTH_CONTRACT'] || '',
+      priceId: process.env['PRICE_ID'] || '',
     };
   }
 
@@ -103,8 +102,8 @@ class DemoOrchestrator {
     console.log(chalk.gray(`   Premium Token: ${this.config.premiumToken}`));
     console.log(chalk.gray(`   Pyth Contract: ${this.config.pythContract}`));
     console.log(chalk.gray(`   Price ID: ${this.config.priceId}`));
-    console.log(chalk.gray(`   Private Key: ${process.env.PRIVATE_KEY ? '***' + process.env.PRIVATE_KEY.slice(-4) : 'NOT SET'}`));
-    console.log(chalk.gray(`   RPC URL: ${process.env.SEPOLIA_RPC_URL || 'NOT SET'}`));
+    console.log(chalk.gray(`   Private Key: ${process.env['PRIVATE_KEY'] ? '***' + process.env['PRIVATE_KEY'].slice(-4) : 'NOT SET'}`));
+    console.log(chalk.gray(`   RPC URL: ${process.env['BASE_SEPOLIA_RPC_URL'] || 'NOT SET'}`));
     
     await this.validateEnvironment();
     await this.startUIAndBot();
@@ -176,13 +175,13 @@ class DemoOrchestrator {
   }
 
   private async deployCoverageManager(): Promise<void> {
-    logStep('Deploying CoverageManager', 'Deploying smart contract to Sepolia...');
+    logStep('Deploying CoverageManager', 'Deploying smart contract to Base Sepolia...');
     
-    const command = 'npm run deploy:sepolia';
+    const command = 'npm run deploy:base-sepolia';
     this.commands.push(command);
     
     try {
-      const { stdout } = await run('npm', ['run', 'deploy:sepolia']);
+      const { stdout } = await run('npm', ['run', 'deploy:base-sepolia']);
       
       // Extract address from stdout
       const addressMatch = stdout.match(/CoverageManager:\s+(0x[a-fA-F0-9]{40})/);
@@ -190,17 +189,19 @@ class DemoOrchestrator {
         throw new Error('Could not find CoverageManager address in deploy output');
       }
       
-      this.config.coverageManager = addressMatch[1];
+      this.config.coverageManager = addressMatch[1] || '';
       
       // Update addresses.json
       const addressesPath = './packages/shared/addresses.json';
       const addresses = readJson(addressesPath);
-      addresses.networks.sepolia.coverageManager = this.config.coverageManager;
+      addresses.networks['base-sepolia'].coverageManager = this.config.coverageManager;
       writeJson(addressesPath, addresses);
       logInfo(`Updated ${addressesPath}`);
       
       // Update UI .env
-      setEnvLine('./ui/.env', 'NEXT_PUBLIC_COVERAGE_MANAGER', this.config.coverageManager);
+      if (this.config.coverageManager) {
+        setEnvLine('./ui/.env', 'NEXT_PUBLIC_COVERAGE_MANAGER', this.config.coverageManager);
+      }
       logInfo(`Updated ./ui/.env`);
       
       logSuccess(`CoverageManager deployed: ${this.config.coverageManager}`);
@@ -245,7 +246,7 @@ class DemoOrchestrator {
     this.commands.push(command);
     
     try {
-      const { stdout } = await run('npm', ['run', 'buy', '--', '0x0000000000000000000000000000000000000000', '10', '9000', '7200', this.config.priceId]);
+      await run('npm', ['run', 'buy', '--', '0x0000000000000000000000000000000000000000', '10', '9000', '7200', this.config.priceId]);
       
       // Extract policy ID from output (assume 1 for now)
       this.config.policyId = 1;
@@ -303,6 +304,7 @@ class DemoOrchestrator {
   private async printSummary(): Promise<void> {
     console.log(chalk.green.bold('\n📊 Demo Summary'));
     console.log(chalk.gray('=' .repeat(50)));
+    console.log(chalk.cyan(`Chain ID: ${BASE_SEPOLIA_CHAIN_ID} (Base Sepolia)`));
     console.log(chalk.cyan(`CoverageManager: ${this.config.coverageManager}`));
     console.log(chalk.cyan(`Premium Token: ${this.config.premiumToken}`));
     console.log(chalk.cyan(`Pyth Contract: ${this.config.pythContract}`));

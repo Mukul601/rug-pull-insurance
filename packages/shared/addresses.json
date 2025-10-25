@@ -1,0 +1,48 @@
+{
+  "networks": {
+    "mainnet": {
+      "chainId": 1,
+      "name": "Ethereum Mainnet",
+      "coverageManager": "",
+      "paymentToken": "",
+      "pythContract": "0x4305FB66699C3B2702D4d05CF1b3043e0CA0a3cF",
+      "priceIds": {
+        "ETH_USD": "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
+        "BTC_USD": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43"
+      }
+    },
+    "sepolia": {
+      "chainId": 11155111,
+      "name": "Sepolia Testnet",
+      "coverageManager": "0xd95F56173601c0D62d6CEd892E8D86483a658922",
+      "paymentToken": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+      "pythContract": "0x2880aB155794e717c66B316F0aA1B4E0a23D978f",
+      "priceIds": {
+        "ETH_USD": "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
+        "BTC_USD": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43"
+      }
+    },
+    "base": {
+      "chainId": 8453,
+      "name": "Base Mainnet",
+      "coverageManager": "",
+      "paymentToken": "",
+      "pythContract": "0x5953f2538F613E05bAED8A5AeFa8e6622467AD3D",
+      "priceIds": {
+        "ETH_USD": "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
+        "BTC_USD": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43"
+      }
+    },
+    "base-sepolia": {
+      "chainId": 84532,
+      "name": "Base Sepolia Testnet",
+      "coverageManager": "",
+      "paymentToken": "",
+      "pythContract": "0x2880aB155794e717c66B316F0aA1B4E0a23D978f",
+      "priceIds": {
+        "ETH_USD": "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
+        "BTC_USD": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43"
+      }
+    }
+  }
+}
