@@ -85,7 +85,7 @@ The demo will:
 ### Smart Contracts
 - **CoverageManager**: Main insurance contract with policy management
 - **MockERC20**: Optional test token for development and testing
-- **MockPyth**: Optional mock price oracle for testing (uses real Pyth on mainnet)
+- **Pyth Integration**: Optional price oracle integration (can be re-enabled by setting PYTH_CONTRACT and PRICE_ID)
 - Comprehensive test suite with Foundry
 
 ### Monitoring Bot
@@ -230,6 +230,24 @@ Configure your RPC URLs in `.env`:
 BASE_RPC_URL=https://mainnet.base.org
 BASE_SEPOLIA_RPC_URL=https://sepolia.base.org
 ```
+
+### Optional Pyth Integration
+The system supports optional Pyth Network integration for real-time price feeds:
+
+**To enable Pyth integration:**
+1. Set `PYTH_CONTRACT` and `PRICE_ID` in your `.env` file:
+   ```bash
+   PYTH_CONTRACT=0x4c5d8A75F3762c1561D96f177694f67378705E98  # Base Sepolia
+   PRICE_ID=0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace  # ETH/USD
+   ```
+
+2. Update UI environment variables:
+   ```bash
+   NEXT_PUBLIC_PYTH=0x4c5d8A75F3762c1561D96f177694f67378705E98
+   NEXT_PUBLIC_PRICE_ID=0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace
+   ```
+
+**Default behavior:** Without Pyth configuration, the system uses fast mode (0% trigger) for immediate claimability.
 
 ## Deployment
 

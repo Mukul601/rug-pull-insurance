@@ -39,8 +39,8 @@ interface DemoConfig {
 
 // Constants
 const BASE_SEPOLIA_CHAIN_ID = 84532;
-const REQUIRED_ROOT_VARS = ['PRIVATE_KEY', 'BASE_SEPOLIA_RPC_URL', 'PREMIUM_TOKEN', 'PYTH_CONTRACT', 'PRICE_ID'];
-const REQUIRED_UI_VARS = ['NEXT_PUBLIC_CHAIN_ID', 'NEXT_PUBLIC_RPC_URL', 'NEXT_PUBLIC_PYTH'];
+const REQUIRED_ROOT_VARS = ['PRIVATE_KEY', 'BASE_SEPOLIA_RPC_URL', 'PREMIUM_TOKEN'];
+const REQUIRED_UI_VARS = ['NEXT_PUBLIC_CHAIN_ID', 'NEXT_PUBLIC_RPC_URL'];
 
 // CLI argument parser
 function parseArgs() {
@@ -109,12 +109,12 @@ class DemoOrchestrator {
   constructor() {
     const cliArgs = parseArgs();
     this.config = {
-      mode: (process.env['DEMO_MODE'] as 'fast' | 'pyth') || cliArgs.mode,
+      mode: 'fast', // Always use fast mode (0% trigger)
       verbose: process.env['VERBOSE'] === 'true' || cliArgs.verbose,
       chain: cliArgs.chain || 'base_sepolia', // Default to base_sepolia
       premiumToken: process.env['PREMIUM_TOKEN'] || '',
-      pythContract: process.env['PYTH_CONTRACT'] || '',
-      priceId: process.env['PRICE_ID'] || '',
+      pythContract: process.env['PYTH_CONTRACT'] || '', // Optional
+      priceId: process.env['PRICE_ID'] || '', // Optional
     };
   }
 
@@ -129,8 +129,8 @@ class DemoOrchestrator {
     console.log(chalk.gray(`   Chain: ${this.config.chain}`));
     console.log(chalk.gray(`   Verbose: ${this.config.verbose}`));
     console.log(chalk.gray(`   Premium Token: ${this.config.premiumToken}`));
-    console.log(chalk.gray(`   Pyth Contract: ${this.config.pythContract}`));
-    console.log(chalk.gray(`   Price ID: ${this.config.priceId}`));
+    console.log(chalk.gray(`   Pyth Contract: ${this.config.pythContract || 'Not configured (optional)'}`));
+    console.log(chalk.gray(`   Price ID: ${this.config.priceId || 'Not configured (optional)'}`));
     console.log(chalk.gray(`   Private Key: ${process.env['PRIVATE_KEY'] ? '***' + process.env['PRIVATE_KEY'].slice(-4) : 'NOT SET'}`));
     console.log(chalk.gray(`   RPC URL: ${process.env['BASE_SEPOLIA_RPC_URL'] || 'NOT SET'}`));
     
@@ -216,8 +216,12 @@ class DemoOrchestrator {
     setEnvLine('./ui/.env', 'NEXT_PUBLIC_CHAIN_ID', chainId);
     setEnvLine('./ui/.env', 'NEXT_PUBLIC_RPC_URL', rpcUrl);
     setEnvLine('./ui/.env', 'NEXT_PUBLIC_PREMIUM_TOKEN', this.config.premiumToken);
-    setEnvLine('./ui/.env', 'NEXT_PUBLIC_PYTH', this.config.pythContract);
-    setEnvLine('./ui/.env', 'NEXT_PUBLIC_PRICE_ID', this.config.priceId);
+    if (this.config.pythContract) {
+      setEnvLine('./ui/.env', 'NEXT_PUBLIC_PYTH', this.config.pythContract);
+    }
+    if (this.config.priceId) {
+      setEnvLine('./ui/.env', 'NEXT_PUBLIC_PRICE_ID', this.config.priceId);
+    }
     
     logInfo(`Updated ./ui/.env with Base ${this.config.chain} configuration`);
   }
@@ -301,31 +305,17 @@ class DemoOrchestrator {
   }
 
   private async makeClaimable(): Promise<void> {
-    if (this.config.mode === 'fast') {
-      logStep('Making Claimable (Fast Mode)', 'Using 0% trigger to make policy claimable...');
-      
-      const command = `npm run check -- ${this.config.policyId} 0`;
-      this.commands.push(command);
-      
-      try {
-        await run('npm', ['run', 'check', '--', this.config.policyId!.toString(), '0']);
-        logSuccess('Policy made claimable (fast mode)');
-      } catch (error) {
-        logError(`Check failed: ${error}`);
-        throw error;
-      }
-    } else {
-      logStep('Making Claimable (Pyth Mode)', 'Using real Pyth price data...');
-      
-      try {
-        await run('npm', ['run', 'pyth:fetch']);
-        await run('npm', ['run', 'pyth:pushcheck', '--', this.config.policyId!.toString()]);
-        logSuccess('Policy made claimable (Pyth mode)');
-      } catch (error) {
-        logInfo('Pyth mode failed, falling back to fast mode');
-        this.config.mode = 'fast';
-        await this.makeClaimable();
-      }
+    logStep('Making Claimable (Fast Mode)', 'Using 0% trigger to make policy claimable...');
+    
+    const command = `npm run check -- ${this.config.policyId} 0`;
+    this.commands.push(command);
+    
+    try {
+      await run('npm', ['run', 'check', '--', this.config.policyId!.toString(), '0']);
+      logSuccess('Policy made claimable (fast mode - 0% trigger)');
+    } catch (error) {
+      logError(`Check failed: ${error}`);
+      throw error;
     }
   }
 
@@ -354,8 +344,8 @@ class DemoOrchestrator {
     console.log(chalk.cyan(`Chain ID: ${chainId} (${chainName})`));
     console.log(chalk.cyan(`CoverageManager: ${this.config.coverageManager}`));
     console.log(chalk.cyan(`Premium Token: ${this.config.premiumToken}`));
-    console.log(chalk.cyan(`Pyth Contract: ${this.config.pythContract}`));
-    console.log(chalk.cyan(`Price ID: ${this.config.priceId}`));
+    console.log(chalk.cyan(`Pyth Contract: ${this.config.pythContract || 'Not configured (optional integration)'}`));
+    console.log(chalk.cyan(`Price ID: ${this.config.priceId || 'Not configured (optional integration)'}`));
     console.log(chalk.cyan(`Policy ID: ${this.config.policyId}`));
     console.log(chalk.cyan(`Mode: ${this.config.mode}`));
     
