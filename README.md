@@ -133,6 +133,19 @@ The `foundry.toml` file contains:
 - Optimizer configuration
 - RPC endpoints for different networks
 - Etherscan API keys for verification
+- **Default RPC**: Set to `base_sepolia` for scripts and tests
+
+#### Environment Variables
+Set up your environment variables in `.env`:
+```bash
+# Base RPC URLs (required for foundry.toml)
+BASE_RPC_URL=https://base-mainnet.g.alchemy.com/v2/YOUR_ALCHEMY_API_KEY
+BASE_SEPOLIA_RPC_URL=https://base-sepolia.g.alchemy.com/v2/YOUR_ALCHEMY_API_KEY
+
+# Other RPC URLs
+RPC_URL_MAINNET=https://eth-mainnet.g.alchemy.com/v2/YOUR_ALCHEMY_API_KEY
+RPC_URL_SEPOLIA=https://eth-sepolia.g.alchemy.com/v2/YOUR_ALCHEMY_API_KEY
+```
 
 ### Bot Configuration
 Configure the monitoring bot through environment variables:
