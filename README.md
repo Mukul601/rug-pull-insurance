@@ -1,6 +1,6 @@
-# Rug Pull Insurance
+# Rug Pull Insurance on Base
 
-A comprehensive Foundry + Node.js hybrid repository for building a rug pull insurance system.
+A comprehensive Foundry + Node.js hybrid repository for building a rug pull insurance system deployed on Base blockchain.
 
 ## Project Structure
 
@@ -16,13 +16,52 @@ A comprehensive Foundry + Node.js hybrid repository for building a rug pull insu
 └── .env.example       # Environment variables template
 ```
 
+## Base Quickstart
+
+Get up and running on Base Sepolia in minutes:
+
+### 1. Environment Setup
+```bash
+# Copy environment templates
+cp .env.example .env
+cd ui && cp .env.example .env.local
+```
+
+### 2. Deploy Mock Token
+```bash
+# Deploy MockERC20 on Base Sepolia
+npm run deploy:mock:base-sepolia
+
+# Copy the deployed token address to your .env files:
+# Root .env: PREMIUM_TOKEN=0x...
+# ui/.env.local: NEXT_PUBLIC_PREMIUM_TOKEN=0x...
+```
+
+### 3. Deploy Coverage Manager
+```bash
+# Deploy main insurance contract
+npm run deploy:base-sepolia
+
+# Copy the deployed contract address to ui/.env.local:
+# NEXT_PUBLIC_COVERAGE_MANAGER=0x...
+```
+
+### 4. Run Complete Demo
+```bash
+# Run the full insurance flow demo
+npm run demo:fast:base
+```
+
+### 5. Open UI
+Open [http://localhost:3000](http://localhost:3000) to see your insurance system running on Base Sepolia!
+
 ## One-Command Demo
 
 Run the complete demo with a single command:
 
 ```bash
-npm run demo:fast   # full loop without Hermes (0% trigger)
-npm run demo:pyth   # full loop with real Pyth pull
+npm run demo:fast:base   # full loop without Hermes (0% trigger)
+npm run demo:pyth:base   # full loop with real Pyth pull
 ```
 
 The demo will:
@@ -33,13 +72,13 @@ The demo will:
 - Approve and buy a policy
 - Make it claimable (fast = 0% trigger, pyth = real Pyth pull)
 - Settle the claim
-- Print explorer links and summary
+- Print BaseScan links and summary
 
 ### Troubleshooting
 
-- If UI doesn't show events, verify `NEXT_PUBLIC_*` in `/ui/.env` and restart `npm run dev`
-- If pyth step fails, check `PYTH_CONTRACT` and `PRICE_ID` against Pyth docs, or use `demo:fast`
-- If deployment fails, ensure you have sufficient ETH for gas fees
+- If UI doesn't show events, verify `NEXT_PUBLIC_*` in `/ui/.env.local` and restart `npm run dev:ui`
+- If pyth step fails, check `PYTH_CONTRACT` and `PRICE_ID` against Pyth docs, or use `demo:fast:base`
+- If deployment fails, ensure you have sufficient ETH for gas fees on Base Sepolia
 
 ## Features
 
@@ -175,30 +214,50 @@ Configure the monitoring bot through environment variables:
 - `BOT_TIMEOUT_MS`: Request timeout in milliseconds
 
 ### Network Configuration
-Supported networks:
-- Ethereum Mainnet
-- Sepolia Testnet
-- Base Mainnet
-- Base Sepolia Testnet
+This project is optimized for Base blockchain deployment:
+
+**Supported Networks:**
+- **Base Mainnet** (Chain ID: 8453) - Production deployment
+- **Base Sepolia** (Chain ID: 84532) - Testnet deployment (recommended for development)
+
+**Explorer Links:**
+- **Base Mainnet**: [basescan.org](https://basescan.org)
+- **Base Sepolia**: [sepolia.basescan.org](https://sepolia.basescan.org)
+
+**RPC Endpoints:**
+Configure your RPC URLs in `.env`:
+```bash
+BASE_RPC_URL=https://mainnet.base.org
+BASE_SEPOLIA_RPC_URL=https://sepolia.base.org
+```
 
 ## Deployment
 
-### Testnet Deployment
+### Base Sepolia Testnet (Recommended)
 ```bash
 # Deploy to Base Sepolia testnet
 npm run deploy:base-sepolia
 
-# Deploy to Ethereum Sepolia testnet
-forge script script/DeployTestnet.s.sol --rpc-url $RPC_URL_SEPOLIA --broadcast --verify
+# Deploy mock token for testing
+npm run deploy:mock:base-sepolia
 ```
 
-### Mainnet Deployment
+### Base Mainnet
 ```bash
 # Deploy to Base mainnet
 npm run deploy:base
 
-# Deploy to Ethereum mainnet
-forge script script/Deploy.s.sol --rpc-url $RPC_URL_MAINNET --broadcast --verify
+# Deploy mock token for testing
+npm run deploy:mock:base
+```
+
+### Manual Deployment
+```bash
+# Deploy using Foundry directly
+forge script script/DeployBase.s.sol --rpc-url base_sepolia --broadcast --verify
+
+# Deploy to specific network
+forge script script/DeployBase.s.sol --rpc-url $BASE_SEPOLIA_RPC_URL --private-key $PRIVATE_KEY --broadcast
 ```
 
 ### Base Deployment Scripts
