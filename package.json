@@ -1,71 +1,9 @@
 {
   "name": "rug-pull-insurance",
   "version": "1.0.0",
-  "description": "Foundry + Node.js hybrid repository for rug pull insurance project",
-  "main": "index.js",
   "scripts": {
-    "build": "forge build",
-    "test": "forge test",
-    "test:coverage": "forge coverage",
-    "deploy": "forge script",
-    "verify": "forge verify-contract",
-    "deploy:mock": "forge script script/DeployMockERC20.s.sol --rpc-url $RPC_URL --broadcast --verify",
-    "deploy:mock:local": "forge script script/DeployMockERC20.s.sol --rpc-url http://localhost:8545 --broadcast",
-    "deploy:base-sepolia": "forge script script/DeployBase.s.sol:Deploy --rpc-url base_sepolia --private-key $PRIVATE_KEY --broadcast -vv",
-    "deploy:base": "forge script script/DeployBase.s.sol:Deploy --rpc-url base --private-key $PRIVATE_KEY --broadcast -vv",
-    "deploy:mock:base-sepolia": "forge create --rpc-url $BASE_SEPOLIA_RPC_URL --private-key $PRIVATE_KEY contracts/mocks/MockERC20.sol:MockERC20 --constructor-args \"Test USD\" \"tUSD\" 6",
-    "mint:mock:base-sepolia": "cast send $PREMIUM_TOKEN \"mint(address,uint256)\" $WALLET_ADDRESS 1000000000 --rpc-url $BASE_SEPOLIA_RPC_URL --private-key $PRIVATE_KEY",
-    "mint": "forge script script/Mint.s.sol --rpc-url $RPC_URL --broadcast",
-    "mint:local": "forge script script/Mint.s.sol --rpc-url http://localhost:8545 --broadcast",
-    "mint:to": "forge script script/Mint.s.sol:MintScript --sig 'mintTo(address,uint256)' --rpc-url $RPC_URL --broadcast",
-    "pyth:fetch": "tsx script/fetchPyth.ts",
-    "demo:fast": "cross-env DEMO_MODE=fast tsx script/orchestrator.ts --verbose",
-    "demo:pyth": "cross-env DEMO_MODE=pyth tsx script/orchestrator.ts --verbose",
-    "demo:fast:base": "cross-env DEMO_MODE=fast tsx script/orchestrator.ts --chain=base_sepolia --verbose",
-    "demo:pyth:base": "cross-env DEMO_MODE=pyth tsx script/orchestrator.ts --chain=base_sepolia --verbose",
-    "smoke:base": "tsx script/smokeBase.ts",
-    "dev:ui": "cd ui && npm run dev",
-    "dev:all": "concurrently -k -n UI,BOT -c cyan,magenta \"npm:dev:ui\" \"npm:bot\"",
-    "bot:dev": "cd bot && npm run dev",
-    "bot:build": "cd bot && npm run build",
-    "bot:start": "cd bot && npm start",
-    "bot:ws": "cd bot && npm run bot:ws",
-    "shared:build": "cd packages/shared && npm run build",
-    "shared:dev": "cd packages/shared && npm run dev",
-    "ui:dev": "cd ui && npm run dev",
-    "ui:build": "cd ui && npm run build",
-    "ui:start": "cd ui && npm start",
-    "install:all": "npm install && cd bot && npm install && cd ../packages/shared && npm install && cd ../ui && npm install",
-    "clean": "forge clean && rm -rf node_modules bot/node_modules packages/shared/node_modules ui/node_modules"
-  },
-  "keywords": [
-    "ethereum",
-    "solidity",
-    "foundry",
-    "defi",
-    "insurance",
-    "rug-pull"
-  ],
-  "author": "",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/node": "^20.10.0",
-    "chalk": "^4.1.2",
-    "concurrently": "^7.6.0",
-    "cross-env": "^7.0.3",
-    "execa": "^7.2.0",
-    "ts-node": "^10.9.0",
-    "tsx": "^4.20.6",
-    "typescript": "^5.3.0",
-    "wait-on": "^7.0.1"
-  },
-  "dependencies": {
-    "dotenv": "^16.3.1",
-    "ethers": "^6.8.0",
-    "viem": "^1.19.0"
-  },
-  "workspaces": [
-    "bot",
-    "packages/shared"
-  ]
+    "build": "cd ui && npm install && npm run build",
+    "start": "cd ui && npm run start",
+    "dev": "cd ui && npm run dev"
+  }
 }

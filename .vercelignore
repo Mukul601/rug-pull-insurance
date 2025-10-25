@@ -1,0 +1,7 @@
+node_modules
+contracts
+script
+foundry.toml
+forge.toml
+README.md
+package-lock.json
