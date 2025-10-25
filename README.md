@@ -207,6 +207,24 @@ The project includes dedicated Base deployment scripts:
 - `npm run deploy:base-sepolia`: Deploy to Base Sepolia testnet
 - `npm run deploy:base`: Deploy to Base mainnet
 
+### Mock Token Deployment
+For testing and development, you can deploy and mint mock tokens:
+
+```bash
+# Deploy MockERC20 to Base Sepolia
+npm run deploy:mock:base-sepolia
+
+# Mint 1000 tUSD tokens to your wallet
+npm run mint:mock:base-sepolia
+```
+
+**Important**: After deploying the mock token, update your `.env` file with the deployed `PREMIUM_TOKEN` address:
+```bash
+# Add to your .env file
+PREMIUM_TOKEN=0x...  # Address from deploy:mock:base-sepolia output
+WALLET_ADDRESS=0x... # Your wallet address for minting
+```
+
 **Note**: Make sure your Alchemy app has Base networks enabled. If you get a 403 error, visit your Alchemy dashboard to enable Base and Base Sepolia networks.
 
 ## Monitoring

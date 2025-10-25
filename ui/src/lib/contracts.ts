@@ -1,5 +1,5 @@
 import { createPublicClient as viemCreatePublicClient, createWalletClient as viemCreateWalletClient, http, type Address, type Chain } from 'viem';
-import { mainnet, sepolia, polygon, arbitrum, optimism } from 'viem/chains';
+import { base, baseSepolia } from 'viem/chains';
 import CoverageManagerABIData from '../../../packages/shared/abi.json';
 
 // ============ ENVIRONMENT VARIABLES ============

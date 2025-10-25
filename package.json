@@ -13,6 +13,8 @@
     "deploy:mock:local": "forge script script/DeployMockERC20.s.sol --rpc-url http://localhost:8545 --broadcast",
     "deploy:base-sepolia": "forge script script/DeployBase.s.sol:Deploy --rpc-url base_sepolia --private-key $PRIVATE_KEY --broadcast -vv",
     "deploy:base": "forge script script/DeployBase.s.sol:Deploy --rpc-url base --private-key $PRIVATE_KEY --broadcast -vv",
+    "deploy:mock:base-sepolia": "forge create --rpc-url $BASE_SEPOLIA_RPC_URL --private-key $PRIVATE_KEY contracts/mocks/MockERC20.sol:MockERC20 --constructor-args \"Test USD\" \"tUSD\" 6",
+    "mint:mock:base-sepolia": "cast send $PREMIUM_TOKEN \"mint(address,uint256)\" $WALLET_ADDRESS 1000000000 --rpc-url $BASE_SEPOLIA_RPC_URL --private-key $PRIVATE_KEY",
     "mint": "forge script script/Mint.s.sol --rpc-url $RPC_URL --broadcast",
     "mint:local": "forge script script/Mint.s.sol --rpc-url http://localhost:8545 --broadcast",
     "mint:to": "forge script script/Mint.s.sol:MintScript --sig 'mintTo(address,uint256)' --rpc-url $RPC_URL --broadcast",
